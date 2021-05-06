@@ -124,62 +124,62 @@ def main():
     
     ##ОГРОМНЫЙ КОСТЫЛЬ 
     class cutted_dataset(object):
-    def __init__(self, root = 'dataset', smiles2graph = smiles2graph, only_smiles=False, part=None, what=None):
+        def __init__(self, root = 'dataset', smiles2graph = smiles2graph, only_smiles=False, part=None, what=None):
  
 
-        self.original_root = root
-        self.smiles2graph = smiles2graph
-        self.only_smiles = only_smiles
+            self.original_root = root
+            self.smiles2graph = smiles2graph
+            self.only_smiles = only_smiles
 
-        self.version = 1
-        self.part = part
-        self.what = what
+            self.version = 1
+            self.part = part
+            self.what = what
 
         #self.prepare_smiles()
-        self.data_cutter()
+            self.data_cutter()
 
-    def data_cutter(self):
-        part_rows = int(len(split_idx[self.what])*self.part)
-        part_data=list()
-        self.graphs = []
-        self.labels = []
-        if self.what=='test':
-          for idx in split_idx[self.what]:
-              graph_obj = smiles2graph(dataset[idx][0])
-              self.graphs.append(graph_obj)
-              gap = dataset[idx][1]
-              self.labels.append(gap)
-              part_data = {'graphs': graphs, 'labels': labels}
-        else:
-          for i in range(part_rows):
-            graph_obj = smiles2graph(dataset[split_idx[self.what][0]][0])
-            self.graphs.append(graph_obj)
-            gap = dataset[split_idx[self.what][0]][1]
-            self.labels.append(gap)
-            part_data = {'graphs': self.graphs, 'labels': self.labels}
+        def data_cutter(self):
+            part_rows = int(len(split_idx[self.what])*self.part)
+            part_data=list()
+            self.graphs = []
+            self.labels = []
+            if self.what=='test':
+            for idx in split_idx[self.what]:
+                graph_obj = smiles2graph(dataset[idx][0])
+                self.graphs.append(graph_obj)
+                gap = dataset[idx][1]
+                self.labels.append(gap)
+                part_data = {'graphs': graphs, 'labels': labels}
+            else:
+            for i in range(part_rows):
+                graph_obj = smiles2graph(dataset[split_idx[self.what][0]][0])
+                self.graphs.append(graph_obj)
+                gap = dataset[split_idx[self.what][0]][1]
+                self.labels.append(gap)
+                part_data = {'graphs': self.graphs, 'labels': self.labels}
             
-        return part_data
+            return part_data
 
-    def __getitem__(self, idx):
+        def __getitem__(self, idx):
         '''Get datapoint with index'''
 
-        if isinstance(idx, (int, np.integer)):
-            return self.graphs[idx], self.labels[idx]
+            if isinstance(idx, (int, np.integer)):
+                return self.graphs[idx], self.labels[idx]
 
-        raise IndexError(
+            raise IndexError(
             'Only integer is valid index (got {}).'.format(type(idx).__name__))
 
-    def __len__(self):
+        def __len__(self):
         '''Length of the dataset
         Returns
         -------
         int
             Length of Dataset
         '''
-        return len(self.graphs)
+            return len(self.graphs)
 
-    def __repr__(self):  # pragma: no cover
-        return '{}({})'.format(self.__class__.__name__, len(self))
+        def __repr__(self):  # pragma: no cover
+            return '{}({})'.format(self.__class__.__name__, len(self))
 
     train_data = data_cutter(dataset, part=args.part, what='train')
     print('train', len(train_data))
