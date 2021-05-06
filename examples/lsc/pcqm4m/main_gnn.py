@@ -1,5 +1,5 @@
 import torch
-from torch_geometric.data import DataLoader, Data
+from torch_geometric.data import DataLoader, Data, DataListLoader
 import torch.optim as optim
 import torch.nn.functional as F
 from torch.utils.tensorboard import SummaryWriter
@@ -125,13 +125,13 @@ def main():
     ##ОГРОМНЫЙ КОСТЫЛЬ 
     def data_cutter(part, what):
         part_rows = int(len(split_idx[what])*part)
-        part_data=list()
+        part_data=[]
         for i in range(part_rows):
             graph_obj = smiles2graph(dataset[i][0])
             gap = dataset[i][1]
             molecule = Data(x=torch.tensor(graph_obj['node_feat']), edge_index=torch.tensor(graph_obj['edge_index']), edge_attr=torch.tensor(graph_obj['edge_feat']), node_num=torch.tensor(graph_obj['num_nodes']))
             tup = (molecule, gap)
-            part_data.insert(0, tup)
+            part_data.append(tup)
             
         return part_data
     train_data = data_cutter(args.part, 'train')
@@ -141,6 +141,7 @@ def main():
     train_loader = DataLoader(train_data, batch_size=args.batch_size, shuffle=True, num_workers = args.num_workers)
     valid_loader = DataLoader(train_data, batch_size=args.batch_size, shuffle=True, num_workers = args.num_workers)
     test_loader = DataLoader(train_data, batch_size=args.batch_size, shuffle=True, num_workers = args.num_workers)
+
     ##КОНЕЦ ОГРОМНОГО КОСТЫЛЯ
     
     #if args.train_subset:
