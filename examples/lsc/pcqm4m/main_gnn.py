@@ -125,13 +125,14 @@ def main():
     ##ОГРОМНЫЙ КОСТЫЛЬ 
     def data_cutter(part, what):
         part_rows = int(len(split_idx[what])*part)
-        part_data=[]
+        part_data=list()
         for i in range(part_rows):
-            obj = smiles2graph(dataset[i][0])
+            graph_obj = smiles2graph(dataset[i][0])
             gap = dataset[i][1]
-            string = (obj, gap)
-            tup = (obj, gap)
-            part_data.append(tup)
+            molecule = Data(x=torch.tensor(graph_obj['node_feat']), edge_index=torch.tensor(graph_obj['edge_index']), edge_attr=torch.tensor(graph_obj['edge_feat']), node_num=torch.tensor(graph_obj['num_nodes']))
+            tup = (molecule, gap)
+            part_data.insert(0, tup)
+            
         return part_data
     train_data = data_cutter(args.part, 'train')
     valid_data = data_cutter(args.part, 'valid')
