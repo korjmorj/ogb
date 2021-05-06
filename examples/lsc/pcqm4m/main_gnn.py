@@ -113,7 +113,7 @@ def main():
     device = torch.device("cuda:" + str(args.device)) if torch.cuda.is_available() else torch.device("cpu")
 
     ### automatic dataloading and splitting
-    dataset = PygPCQM4MDataset(root = 'dataset/')
+    dataset = PygPCQM4MDataset(root = 'dataset/', smiles2graph = smiles2graph)
 
     split_idx = dataset.get_idx_split()
 
