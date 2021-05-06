@@ -176,11 +176,11 @@ def main():
         def __repr__(self):  # pragma: no cover
             return '{}({})'.format(self.__class__.__name__, len(self))
 
-    train_data = data_cutter(dataset, part=args.part, what='train')
+    train_data = cutted_dataset(dataset, part=args.part, what='train')
     print('train', len(train_data))
-    valid_data = data_cutter(dataset, part=args.part, what='train')
+    valid_data = cutted_dataset(dataset, part=args.part, what='train')
     print('valid', len(valid_data))
-    test_data = data_cutter(dataset, part=args.part, what='train')
+    test_data = cutted_dataset(dataset, part=args.part, what='train')
     print('test', len(test_data))
     
     train_loader = DataLoader(train_data, batch_size=args.batch_size, shuffle=True, num_workers = args.num_workers)
