@@ -92,6 +92,7 @@ def main():
     parser.add_argument('--emb_dim', type=int, default=600,
                         help='dimensionality of hidden units in GNNs (default: 600)')
     parser.add_argument('--train_subset', action='store_true')
+    parser.add_argument('--part', type=float, default=0.1)
     parser.add_argument('--batch_size', type=int, default=256,
                         help='input batch size for training (default: 256)')
     parser.add_argument('--epochs', type=int, default=100,
@@ -114,24 +115,44 @@ def main():
     device = torch.device("cuda:" + str(args.device)) if torch.cuda.is_available() else torch.device("cpu")
 
     ### automatic dataloading and splitting
-    dataset = PygPCQM4MDataset(root = 'dataset/', smiles2graph = smiles2graph)
+    dataset = PygPCQM4MDataset(root = 'dataset/', only_smiles = True)
 
     split_idx = dataset.get_idx_split()
 
     ### automatic evaluator. takes dataset name as input
     evaluator = PCQM4MEvaluator()
+    
+    ##ОГРОМНЫЙ КОСТЫЛЬ 
+    def data_cutter(part, what)
+        part_rows = int(len(split_idx[what])*train_part)
+        part_data=[]
+        for i in range(part_rows):
+            obj = smiles2graph(dataset[i][0])
+            gap = dataset[i][1]
+            string = (obj, gap)
+            tup = (obj, gap)
+            part_data.append(tup)
+        return part_data
+    train_data = data_cutter(args.part, 'train')
+    valid_data = data_cutter(args.part, 'valid')
+    test_data = data_cutter(args.part, 'test')
+    
+    train_loader = DataLoader(train_data, batch_size=args.batch_size, shuffle=True, num_workers = args.num_workers)
+    valid_loader = DataLoader(train_data, batch_size=args.batch_size, shuffle=True, num_workers = args.num_workers)
+    test_loader = DataLoader(train_data, batch_size=args.batch_size, shuffle=True, num_workers = args.num_workers)
+    ##КОНЕЦ ОГРОМНОГО КОСТЫЛЯ
+    
+    #if args.train_subset:
+        #subset_ratio = 0.1
+        #subset_idx = torch.randperm(len(split_idx["train"]))[:int(subset_ratio*len(split_idx["train"]))]
+        #train_loader = DataLoader(dataset[split_idx["train"][subset_idx]], batch_size=args.batch_size, shuffle=True, num_workers = args.num_workers)
+    #else:
+        #train_loader = DataLoader(dataset[split_idx["train"]], batch_size=args.batch_size, shuffle=True, num_workers = args.num_workers)
 
-    if args.train_subset:
-        subset_ratio = 0.1
-        subset_idx = torch.randperm(len(split_idx["train"]))[:int(subset_ratio*len(split_idx["train"]))]
-        train_loader = DataLoader(dataset[split_idx["train"][subset_idx]], batch_size=args.batch_size, shuffle=True, num_workers = args.num_workers)
-    else:
-        train_loader = DataLoader(dataset[split_idx["train"]], batch_size=args.batch_size, shuffle=True, num_workers = args.num_workers)
+    #valid_loader = DataLoader(dataset[split_idx["valid"]], batch_size=args.batch_size, shuffle=False, num_workers = args.num_workers)
 
-    valid_loader = DataLoader(dataset[split_idx["valid"]], batch_size=args.batch_size, shuffle=False, num_workers = args.num_workers)
-
-    if args.save_test_dir is not '':
-        test_loader = DataLoader(dataset[split_idx["test"]], batch_size=args.batch_size, shuffle=False, num_workers = args.num_workers)
+    #if args.save_test_dir is not '':
+        #test_loader = DataLoader(dataset[split_idx["test"]], batch_size=args.batch_size, shuffle=False, num_workers = args.num_workers)
 
     if args.checkpoint_dir is not '':
         os.makedirs(args.checkpoint_dir, exist_ok = True)
