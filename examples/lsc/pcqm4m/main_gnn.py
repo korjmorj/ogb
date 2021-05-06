@@ -149,14 +149,16 @@ def main():
                     self.graphs.append(graph_obj)
                     gap = dataset[idx][1]
                     self.labels.append(gap)
-                    part_data = {'graphs': graphs, 'labels': labels}
+                self.labels = np.array(self.labels)
+                part_data = {'graphs': self.graphs, 'labels': self.labels}
             else:
                 for i in range(part_rows):
                     graph_obj = smiles2graph(dataset[split_idx[self.what][0]][0])
                     self.graphs.append(graph_obj)
                     gap = dataset[split_idx[self.what][0]][1]
                     self.labels.append(gap)
-                    part_data = {'graphs': self.graphs, 'labels': self.labels}
+                self.labels = np.array(self.labels)
+                part_data = {'graphs': self.graphs, 'labels': self.labels}
             
             return part_data
 
