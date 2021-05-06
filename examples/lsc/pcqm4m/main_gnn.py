@@ -129,7 +129,7 @@ def main():
         for i in range(part_rows):
             graph_obj = smiles2graph(dataset[i][0])
             gap = dataset[i][1]
-            molecule = Data(x=torch.tensor(graph_obj['node_feat']), edge_index=torch.tensor(graph_obj['edge_index']), edge_attr=torch.tensor(graph_obj['edge_feat']), node_num=torch.tensor(graph_obj['num_nodes']), y=gap)
+            molecule = Data(x=torch.tensor(graph_obj['node_feat']), edge_index=torch.tensor(graph_obj['edge_index']), edge_attr=torch.tensor(graph_obj['edge_feat']), node_num=torch.tensor(graph_obj['num_nodes']), y=torch.tensor(gap))
             
             part_data.append(molecule)
             
