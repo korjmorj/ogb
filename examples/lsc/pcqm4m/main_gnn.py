@@ -123,33 +123,69 @@ def main():
     evaluator = PCQM4MEvaluator()
     
     ##ОГРОМНЫЙ КОСТЫЛЬ 
-    def data_cutter(part, what):
-        part_rows = int(len(split_idx[what])*part)
+    class cutted_dataset(object):
+    def __init__(self, root = 'dataset', smiles2graph = smiles2graph, only_smiles=False, part=None, what=None):
+ 
+
+        self.original_root = root
+        self.smiles2graph = smiles2graph
+        self.only_smiles = only_smiles
+
+        self.version = 1
+        self.part = part
+        self.what = what
+
+        #self.prepare_smiles()
+        self.data_cutter()
+
+    def data_cutter(self):
+        part_rows = int(len(split_idx[self.what])*self.part)
         part_data=list()
-        graphs = []
-        labels = []
-        if what=='test':
-          for idx in split_idx[what]:
+        self.graphs = []
+        self.labels = []
+        if self.what=='test':
+          for idx in split_idx[self.what]:
               graph_obj = smiles2graph(dataset[idx][0])
-              graphs.append(graph_obj)
+              self.graphs.append(graph_obj)
               gap = dataset[idx][1]
-              labels.append(gap)
+              self.labels.append(gap)
               part_data = {'graphs': graphs, 'labels': labels}
         else:
           for i in range(part_rows):
-            graph_obj = smiles2graph(dataset[split_idx[what][i]][0])
-            graphs.append(graph_obj)
-            gap = dataset[split_idx[what][i]][1]
-            labels.append(gap)
-            part_data = {'graphs': graphs, 'labels': labels}
+            graph_obj = smiles2graph(dataset[split_idx[self.what][0]][0])
+            self.graphs.append(graph_obj)
+            gap = dataset[split_idx[self.what][0]][1]
+            self.labels.append(gap)
+            part_data = {'graphs': self.graphs, 'labels': self.labels}
             
         return part_data
 
-    train_data = data_cutter(args.part, 'train')
+    def __getitem__(self, idx):
+        '''Get datapoint with index'''
+
+        if isinstance(idx, (int, np.integer)):
+            return self.graphs[idx], self.labels[idx]
+
+        raise IndexError(
+            'Only integer is valid index (got {}).'.format(type(idx).__name__))
+
+    def __len__(self):
+        '''Length of the dataset
+        Returns
+        -------
+        int
+            Length of Dataset
+        '''
+        return len(self.graphs)
+
+    def __repr__(self):  # pragma: no cover
+        return '{}({})'.format(self.__class__.__name__, len(self))
+
+    train_data = data_cutter(dataset, part=args.part, what='train')
     print('train', len(train_data))
-    valid_data = data_cutter(args.part, 'valid')
+    valid_data = data_cutter(dataset, part=args.part, what='train')
     print('valid', len(valid_data))
-    test_data = data_cutter(args.part, 'test')
+    test_data = data_cutter(dataset, part=args.part, what='train')
     print('test', len(test_data))
     
     train_loader = DataLoader(train_data, batch_size=args.batch_size, shuffle=True, num_workers = args.num_workers)
