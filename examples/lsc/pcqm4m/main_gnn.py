@@ -123,7 +123,7 @@ def main():
     evaluator = PCQM4MEvaluator()
     
     ##ОГРОМНЫЙ КОСТЫЛЬ 
-        def data_cutter(part, what):
+    def data_cutter(part, what):
         part_rows = int(len(split_idx[what])*part)
         part_data=list()
         if what=='test':
