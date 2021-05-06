@@ -144,19 +144,19 @@ def main():
             self.graphs = []
             self.labels = []
             if self.what=='test':
-            for idx in split_idx[self.what]:
-                graph_obj = smiles2graph(dataset[idx][0])
-                self.graphs.append(graph_obj)
-                gap = dataset[idx][1]
-                self.labels.append(gap)
-                part_data = {'graphs': graphs, 'labels': labels}
+                for idx in split_idx[self.what]:
+                    graph_obj = smiles2graph(dataset[idx][0])
+                    self.graphs.append(graph_obj)
+                    gap = dataset[idx][1]
+                    self.labels.append(gap)
+                    part_data = {'graphs': graphs, 'labels': labels}
             else:
-            for i in range(part_rows):
-                graph_obj = smiles2graph(dataset[split_idx[self.what][0]][0])
-                self.graphs.append(graph_obj)
-                gap = dataset[split_idx[self.what][0]][1]
-                self.labels.append(gap)
-                part_data = {'graphs': self.graphs, 'labels': self.labels}
+                for i in range(part_rows):
+                    graph_obj = smiles2graph(dataset[split_idx[self.what][0]][0])
+                    self.graphs.append(graph_obj)
+                    gap = dataset[split_idx[self.what][0]][1]
+                    self.labels.append(gap)
+                    part_data = {'graphs': self.graphs, 'labels': self.labels}
             
             return part_data
 
