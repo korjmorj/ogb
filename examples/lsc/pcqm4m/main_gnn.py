@@ -138,9 +138,9 @@ def main():
     valid_data = data_cutter(args.part, 'valid')
     test_data = data_cutter(args.part, 'test')
     
-    train_loader = DataLoader(train_data, batch_size=args.batch_size, shuffle=True, num_workers = args.num_workers)
-    valid_loader = DataLoader(train_data, batch_size=args.batch_size, shuffle=True, num_workers = args.num_workers)
-    test_loader = DataLoader(train_data, batch_size=args.batch_size, shuffle=True, num_workers = args.num_workers)
+    train_loader = DataListLoader(train_data)
+    valid_loader = DataListLoader(train_data)
+    test_loader = DataListLoader(train_data)
 
     ##КОНЕЦ ОГРОМНОГО КОСТЫЛЯ
     
