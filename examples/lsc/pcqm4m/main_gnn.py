@@ -123,28 +123,31 @@ def main():
     evaluator = PCQM4MEvaluator()
     
     ##ОГРОМНЫЙ КОСТЫЛЬ 
-    def data_cutter(part, what):
+        def data_cutter(part, what):
         part_rows = int(len(split_idx[what])*part)
         part_data=list()
-        if what=='valid':
+        if what=='test':
           for idx in split_idx[what]:
               graph_obj = smiles2graph(dataset[idx][0])
               gap = dataset[idx][1]
               molecule = Data(x=torch.tensor(graph_obj['node_feat']), edge_index=torch.tensor(graph_obj['edge_index']), edge_attr=torch.tensor(graph_obj['edge_feat']), node_num=torch.tensor(graph_obj['num_nodes']), y=torch.tensor(gap))
               part_data.insert(0, molecule)
         else:
-            for i in range(part_rows):
-                graph_obj = smiles2graph(dataset[split_idx[what][0]][0])
-                gap = dataset[split_idx[what][0]][1]
-                molecule = Data(x=torch.tensor(graph_obj['node_feat']), edge_index=torch.tensor(graph_obj['edge_index']), edge_attr=torch.tensor(graph_obj['edge_feat']), node_num=torch.tensor(graph_obj['num_nodes']), y=torch.tensor(gap))
-                part_data.insert(0, molecule)
+          for i in range(part_rows):
+            graph_obj = smiles2graph(dataset[split_idx[what][0]][0])
+            gap = dataset[split_idx[what][0]][1]
+            molecule = Data(x=torch.tensor(graph_obj['node_feat']), edge_index=torch.tensor(graph_obj['edge_index']), edge_attr=torch.tensor(graph_obj['edge_feat']), node_num=torch.tensor(graph_obj['num_nodes']), y=torch.tensor(gap))
+            part_data.insert(0, molecule)
             
         return part_data
             
         return part_data
     train_data = data_cutter(args.part, 'train')
+    print('train', len(train_data))
     valid_data = data_cutter(args.part, 'valid')
+    print('valid', len(valid_data))
     test_data = data_cutter(args.part, 'test')
+    print('test', len(test_data))
     
     train_loader = DataLoader(train_data, batch_size=args.batch_size, shuffle=True, num_workers = args.num_workers)
     valid_loader = DataLoader(train_data, batch_size=args.batch_size, shuffle=True, num_workers = args.num_workers)
