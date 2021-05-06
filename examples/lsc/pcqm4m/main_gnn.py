@@ -126,7 +126,7 @@ def main():
     def data_cutter(part, what):
         part_rows = int(len(split_idx[what])*part)
         part_data=list()
-        if what=='test':
+        if what=='valid':
           for idx in split_idx[what]:
               graph_obj = smiles2graph(dataset[idx][0])
               gap = dataset[idx][1]
