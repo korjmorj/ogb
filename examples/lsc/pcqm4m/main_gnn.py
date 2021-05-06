@@ -17,6 +17,7 @@ import random
 
 ### importing OGB-LSC
 from ogb.lsc import PygPCQM4MDataset, PCQM4MEvaluator
+from ogb.lsc import PCQM4MDataset
 from ogb.utils import smiles2graph
 
 reg_criterion = torch.nn.L1Loss()
@@ -115,8 +116,7 @@ def main():
     device = torch.device("cuda:" + str(args.device)) if torch.cuda.is_available() else torch.device("cpu")
 
     ### automatic dataloading and splitting
-    dataset = PygPCQM4MDataset(root = 'dataset/', only_smiles = True)
-
+    dataset = PCQM4MDataset(root = 'dataset/', only_smiles = True)
     split_idx = dataset.get_idx_split()
 
     ### automatic evaluator. takes dataset name as input
