@@ -125,13 +125,21 @@ def main():
     ##ОГРОМНЫЙ КОСТЫЛЬ 
     def data_cutter(part, what):
         part_rows = int(len(split_idx[what])*part)
-        part_data=[]
-        for i in range(part_rows):
-            graph_obj = smiles2graph(dataset[i][0])
-            gap = dataset[i][1]
-            molecule = Data(x=torch.tensor(graph_obj['node_feat']), edge_index=torch.tensor(graph_obj['edge_index']), edge_attr=torch.tensor(graph_obj['edge_feat']), node_num=torch.tensor(graph_obj['num_nodes']), y=torch.tensor(gap))
+        part_data=list()
+        if what=='test':
+          for idx in split_idx[what]:
+              graph_obj = smiles2graph(dataset[idx][0])
+              gap = dataset[idx][1]
+              molecule = Data(x=torch.tensor(graph_obj['node_feat']), edge_index=torch.tensor(graph_obj['edge_index']), edge_attr=torch.tensor(graph_obj['edge_feat']), node_num=torch.tensor(graph_obj['num_nodes']), y=torch.tensor(gap))
+              part_data.insert(0, molecule)
+        else:
+            for i in range(part_rows):
+                graph_obj = smiles2graph(dataset[split_idx[what][0]][0])
+                gap = dataset[split_idx[what][0]][1]
+                molecule = Data(x=torch.tensor(graph_obj['node_feat']), edge_index=torch.tensor(graph_obj['edge_index']), edge_attr=torch.tensor(graph_obj['edge_feat']), node_num=torch.tensor(graph_obj['num_nodes']), y=torch.tensor(gap))
+                part_data.insert(0, molecule)
             
-            part_data.append(molecule)
+        return part_data
             
         return part_data
     train_data = data_cutter(args.part, 'train')
