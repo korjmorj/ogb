@@ -129,18 +129,18 @@ def main():
         for i in range(part_rows):
             graph_obj = smiles2graph(dataset[i][0])
             gap = dataset[i][1]
-            molecule = Data(x=torch.tensor(graph_obj['node_feat']), edge_index=torch.tensor(graph_obj['edge_index']), edge_attr=torch.tensor(graph_obj['edge_feat']), node_num=torch.tensor(graph_obj['num_nodes']))
-            tup = (molecule, gap)
-            part_data.append(tup)
+            molecule = Data(x=torch.tensor(graph_obj['node_feat']), edge_index=torch.tensor(graph_obj['edge_index']), edge_attr=torch.tensor(graph_obj['edge_feat']), node_num=torch.tensor(graph_obj['num_nodes']), y=gap)
+            
+            part_data.append(molecule)
             
         return part_data
     train_data = data_cutter(args.part, 'train')
     valid_data = data_cutter(args.part, 'valid')
     test_data = data_cutter(args.part, 'test')
     
-    train_loader = DataListLoader(train_data)
-    valid_loader = DataListLoader(train_data)
-    test_loader = DataListLoader(train_data)
+    train_loader = DataLoader(train_data, batch_size=args.batch_size, shuffle=True, num_workers = args.num_workers)
+    valid_loader = DataLoader(train_data, batch_size=args.batch_size, shuffle=True, num_workers = args.num_workers)
+    test_loader = DataLoader(train_data, batch_size=args.batch_size, shuffle=True, num_workers = args.num_workers)
 
     ##КОНЕЦ ОГРОМНОГО КОСТЫЛЯ
     
