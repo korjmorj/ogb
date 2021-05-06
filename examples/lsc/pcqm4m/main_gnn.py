@@ -126,22 +126,25 @@ def main():
     def data_cutter(part, what):
         part_rows = int(len(split_idx[what])*part)
         part_data=list()
+        graphs = []
+        labels = []
         if what=='test':
           for idx in split_idx[what]:
               graph_obj = smiles2graph(dataset[idx][0])
+              graphs.append(graph_obj)
               gap = dataset[idx][1]
-              molecule = Data(x=torch.tensor(graph_obj['node_feat']), edge_index=torch.tensor(graph_obj['edge_index']), edge_attr=torch.tensor(graph_obj['edge_feat']), node_num=torch.tensor(graph_obj['num_nodes']), y=torch.tensor(gap))
-              part_data.insert(0, molecule)
+              labels.append(gap)
+              part_data = {'graphs': graphs, 'labels': labels}
         else:
           for i in range(part_rows):
-            graph_obj = smiles2graph(dataset[split_idx[what][0]][0])
-            gap = dataset[split_idx[what][0]][1]
-            molecule = Data(x=torch.tensor(graph_obj['node_feat']), edge_index=torch.tensor(graph_obj['edge_index']), edge_attr=torch.tensor(graph_obj['edge_feat']), node_num=torch.tensor(graph_obj['num_nodes']), y=torch.tensor(gap))
-            part_data.insert(0, molecule)
+            graph_obj = smiles2graph(dataset[split_idx[what][i]][0])
+            graphs.append(graph_obj)
+            gap = dataset[split_idx[what][i]][1]
+            labels.append(gap)
+            part_data = {'graphs': graphs, 'labels': labels}
             
         return part_data
-            
-        return part_data
+
     train_data = data_cutter(args.part, 'train')
     print('train', len(train_data))
     valid_data = data_cutter(args.part, 'valid')
