@@ -161,7 +161,7 @@ def main():
             return part_data
 
         def __getitem__(self, idx):
-        '''Get datapoint with index'''
+
 
             if isinstance(idx, (int, np.integer)):
                 return self.graphs[idx], self.labels[idx]
@@ -170,12 +170,7 @@ def main():
             'Only integer is valid index (got {}).'.format(type(idx).__name__))
 
         def __len__(self):
-        '''Length of the dataset
-        Returns
-        -------
-        int
-            Length of Dataset
-        '''
+
             return len(self.graphs)
 
         def __repr__(self):  # pragma: no cover
