@@ -17,6 +17,7 @@ import random
 
 ### importing OGB-LSC
 from ogb.lsc import PygPCQM4MDataset, PCQM4MEvaluator
+from ogb.utils import smiles2graph
 
 reg_criterion = torch.nn.L1Loss()
 
