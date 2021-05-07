@@ -174,7 +174,7 @@ def main():
     split_idx = dataset.get_idx_split()
 
     ### automatic evaluator. takes dataset name as input
-    evaluator = PCQM4MEvaluator()
+    evaluator = PCQM4MEvaluator_cutted()
     
     ##ОГРОМНЫЙ КОСТЫЛЬ 
     def data_cutter(part, what):
