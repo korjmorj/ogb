@@ -118,61 +118,141 @@ def main():
     device = torch.device("cuda:" + str(args.device)) if torch.cuda.is_available() else torch.device("cpu")
 
     ### automatic dataloading and splitting
-    dataset = PCQM4MDataset(root = 'dataset/', only_smiles = True)
-    split_idx = dataset.get_idx_split()
+    #dataset = PCQM4MDataset(root = 'dataset/', only_smiles = True)
+    #split_idx = dataset.get_idx_split()
 
     ### automatic evaluator. takes dataset name as input
     evaluator = PCQM4MEvaluator()
     
     ##ОГРОМНЫЙ КОСТЫЛЬ 
-    class cutted_dataset(object):
+    class PCQM4MDataset_cutted(object):
         def __init__(self, root = 'dataset', smiles2graph = smiles2graph, only_smiles=False, part=None, what=None):
- 
+
 
             self.original_root = root
             self.smiles2graph = smiles2graph
             self.only_smiles = only_smiles
-
+            self.folder = osp.join(root, 'pcqm4m_kddcup2021')
             self.version = 1
-            self.part = part
-            self.what = what
+            self.what=what
+            self.part=part
 
-        #self.prepare_smiles()
-            self.data_cutter()
+        # Old url hosted at Stanford
+        # self.url = f'http://ogb-data.stanford.edu/data/lsc/pcqm4m_kddcup2021.zip'
+        # New url hosted by DGL team at AWS--much faster to download
+            self.url = 'https://dgl-data.s3-accelerate.amazonaws.com/dataset/OGB-LSC/pcqm4m_kddcup2021.zip'
 
-        def data_cutter(self):
-            part_rows = int(len(split_idx[self.what])*self.part)
+        # check version and update if necessary
+            if osp.isdir(self.folder) and (not osp.exists(osp.join(self.folder, f'RELEASE_v{self.version}.txt'))):
+                print('PCQM4M dataset has been updated.')
+                if input('Will you update the dataset now? (y/N)\n').lower() == 'y':
+                    shutil.rmtree(self.folder)
 
-            self.graphs = []
-            #self.labels = []
-            if self.what=='test':
-                for idx in split_idx[self.what]:
-                    graph_obj = smiles2graph(dataset[idx][0])
-                    gap = torch.tensor(dataset[idx][1])
-                    molecule = Data(x=torch.tensor(graph_obj['node_feat']), edge_index=torch.tensor(graph_obj['edge_index']), edge_attr=torch.tensor(graph_obj['edge_feat']), pos=torch.tensor(graph_obj['num_nodes']), y=gap)
-                    self.graphs.append(molecule)
-                    
-                    #self.labels.append(gap)
-                #self.labels = np.array(self.labels)
+            super(PCQM4MDataset, self).__init__()
 
-                #part_data=[{'graphs': self.graphs, 'labels': self.labels}]
+        # Prepare everything.
+        # download if there is no raw file
+        # preprocess if there is no processed file
+        # load data if processed file is found.
+            if self.only_smiles:
+                self.prepare_smiles()
             else:
-                for i in range(part_rows):
-                    graph_obj = smiles2graph(dataset[split_idx[self.what][0]][0])
-                    gap = torch.tensor(dataset[split_idx[self.what][0]][1])
-                    molecule = Data(x=torch.tensor(graph_obj['node_feat']), edge_index=torch.tensor(graph_obj['edge_index']), edge_attr=torch.tensor(graph_obj['edge_feat']), pos=torch.tensor(graph_obj['num_nodes']), y=gap)
-                    self.graphs.append(molecule)
-                    
-                    #self.labels.append(gap)
-                #self.labels = np.array(self.labels)
-                #part_data=[{'graphs': self.graphs, 'labels': self.labels}]
-            #return {'graphs': self.graphs, 'labels': self.labels}
-            
+                self.prepare_graph()
 
+        def download(self):
+            if decide_download(self.url):
+                path = download_url(self.url, self.original_root)
+                extract_zip(path, self.original_root)
+                os.unlink(path)
+            else:
+                print('Stop download.')
+                exit(-1)
+
+        def prepare_smiles(self):
+            raw_dir = osp.join(self.folder, 'raw')
+            if not osp.exists(osp.join(raw_dir, 'data.csv.gz')):
+            # if the raw file does not exist, then download it.
+                self.download()
+
+            data_df = pd.read_csv(osp.join(raw_dir, 'data.csv.gz'))
+            smiles_list = data_df['smiles'].values
+            homolumogap_list = data_df['homolumogap'].values
+            self.graphs = list(smiles_list)
+            self.labels = homolumogap_list
+
+        def prepare_graph(self):
+        
+            processed_dir = osp.join(self.folder, 'processed')
+            raw_dir = osp.join(self.folder, 'raw')
+            pre_processed_file_path = osp.join(processed_dir, 'data_processed')
+
+            if osp.exists(pre_processed_file_path):        
+            # if pre-processed file already exists
+                loaded_dict = torch.load(pre_processed_file_path, 'rb')
+                self.graphs, self.labels = loaded_dict['graphs'], loaded_dict['labels']
+        
+            else:
+            # if pre-processed file does not exist
+            
+                if not osp.exists(osp.join(raw_dir, 'data.csv.gz')):
+                # if the raw file does not exist, then download it.
+                    self.download()
+
+                data_df = pd.read_csv(osp.join(raw_dir, 'data.csv.gz'))
+                smiles_list = data_df['smiles']
+                homolumogap_list = data_df['homolumogap']
+
+                print('Converting SMILES strings into graphs...')
+                split_idx = self.get_idx_split()
+                part_rows = int(len(split_idx[self.what])*self.part)
+                self.graphs = []
+                self.labels = []
+            
+                if self.what=='test':
+                    for i in len(split_idx[self.what]):
+                        smiles = smiles_list[[split_idx[self.what][i]]]
+                        homolumogap = homolumogap_list[[split_idx[self.what][i]]]
+                        graph = self.smiles2graph(smiles)
+                
+                        assert(len(graph['edge_feat']) == graph['edge_index'].shape[1])
+                        assert(len(graph['node_feat']) == graph['num_nodes'])
+
+                        self.graphs.append(graph)
+                        self.labels.append(homolumogap)
+
+                    self.labels = np.array(self.labels)
+                    print(self.labels)
+                else:
+                    for i in tqdm(range(part_rows)):
+
+                        smiles = smiles_list[[split_idx[self.what][i]]]
+                        homolumogap = homolumogap_list[[split_idx[self.what][i]]]
+                        graph = self.smiles2graph(smiles)
+                
+                        assert(len(graph['edge_feat']) == graph['edge_index'].shape[1])
+                        assert(len(graph['node_feat']) == graph['num_nodes'])
+
+                        self.graphs.append(graph)
+                        self.labels.append(homolumogap)
+
+                    self.labels = np.array(self.labels)
+                    print(self.labels)
+
+                print('Saving...')
+                torch.save({'graphs': self.graphs, 'labels': self.labels}, pre_processed_file_path, pickle_protocol=4)
+
+        def get_idx_split(self):
+            split_dict = torch.load(osp.join(self.folder, 'split_dict.pt'))
+            return split_dict
 
         def __getitem__(self, idx):
+ 
 
-            return self.graphs[idx] #, self.labels[idx]
+            if isinstance(idx, (int, np.integer)):
+                return self.graphs[idx], self.labels[idx]
+
+            raise IndexError(
+                'Only integer is valid index (got {}).'.format(type(idx).__name__))
 
         def __len__(self):
 
@@ -181,11 +261,11 @@ def main():
         def __repr__(self):  # pragma: no cover
             return '{}({})'.format(self.__class__.__name__, len(self))
         
-    train_data = cutted_dataset(dataset, part=args.part, what='train')
+    train_data = PCQM4MDataset_cutted(root = 'dataset', smiles2graph = smiles2graph, only_smiles=False, part=args.part, what='train')
     print('train', len(train_data))
-    valid_data = cutted_dataset(dataset, part=args.part, what='valid')
+    train_data = PCQM4MDataset_cutted(root = 'dataset', smiles2graph = smiles2graph, only_smiles=False, part=args.part, what='valid)
     print('valid', len(valid_data))
-    test_data = cutted_dataset(dataset, part=args.part, what='test')
+    test_data = PCQM4MDataset_cutted(root = 'dataset', smiles2graph = smiles2graph, only_smiles=False, part=args.part, what='test')
     print('test', len(test_data))
     
     train_loader = DataLoader(train_data, batch_size=args.batch_size, shuffle=True, num_workers = args.num_workers)
