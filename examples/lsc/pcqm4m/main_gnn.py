@@ -222,7 +222,7 @@ def main():
                 self.labels = []
             
                 if self.what=='test':
-                    for idx in len(split_idx[self.what]):
+                    for idx in range(len(split_idx[self.what])):
                         smiles = smiles_list[split_idx[self.what][idx]]
                         homolumogap = homolumogap_list[split_idx[self.what][idx]]
                         graph = self.smiles2graph(smiles)
