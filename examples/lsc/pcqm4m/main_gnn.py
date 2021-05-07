@@ -162,7 +162,7 @@ def main():
                     self.labels.append(gap)
                 #self.labels = np.array(self.labels)
                 part_data=[{'graphs': self.graphs, 'labels': self.labels}]
-            return part_data
+            return {'graphs': self.graphs, 'labels': self.labels}
             
 
 
