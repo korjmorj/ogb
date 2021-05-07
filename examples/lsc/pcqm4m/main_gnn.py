@@ -263,7 +263,7 @@ def main():
         
     train_data = PCQM4MDataset_cutted(root = 'dataset', smiles2graph = smiles2graph, only_smiles=False, part=args.part, what='train')
     print('train', len(train_data))
-    train_data = PCQM4MDataset_cutted(root = 'dataset', smiles2graph = smiles2graph, only_smiles=False, part=args.part, what='valid)
+    valid_data = PCQM4MDataset_cutted(root = 'dataset', smiles2graph = smiles2graph, only_smiles=False, part=args.part, what='valid')
     print('valid', len(valid_data))
     test_data = PCQM4MDataset_cutted(root = 'dataset', smiles2graph = smiles2graph, only_smiles=False, part=args.part, what='test')
     print('test', len(test_data))
