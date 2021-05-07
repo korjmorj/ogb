@@ -222,15 +222,16 @@ def main():
                 self.labels = []
             
                 if self.what=='test':
-                    for i in len(split_idx[self.what]):
-                        smiles = smiles_list[split_idx[self.what][i]]
-                        homolumogap = homolumogap_list[split_idx[self.what][i]]
+                    for idx in len(split_idx[self.what]):
+                        smiles = smiles_list[split_idx[self.what][idx]]
+                        homolumogap = homolumogap_list[split_idx[self.what][idx]]
                         graph = self.smiles2graph(smiles)
                 
                         assert(len(graph['edge_feat']) == graph['edge_index'].shape[1])
                         assert(len(graph['node_feat']) == graph['num_nodes'])
 
-                        self.graphs.append(graph)
+                        molecule = Data(x=torch.tensor(graph_obj['node_feat']), edge_index=torch.tensor(graph_obj['edge_index']), edge_attr=torch.tensor(graph_obj['edge_feat']), pos=torch.tensor(graph_obj['num_nodes']), y=gap)
+                        self.graphs.append(molecule)
                         self.labels.append(homolumogap)
 
                     self.labels = np.array(self.labels)
@@ -245,7 +246,8 @@ def main():
                         assert(len(graph['edge_feat']) == graph['edge_index'].shape[1])
                         assert(len(graph['node_feat']) == graph['num_nodes'])
 
-                        self.graphs.append(graph)
+                        molecule = Data(x=torch.tensor(graph_obj['node_feat']), edge_index=torch.tensor(graph_obj['edge_index']), edge_attr=torch.tensor(graph_obj['edge_feat']), pos=torch.tensor(graph_obj['num_nodes']), y=gap)
+                        self.graphs.append(molecule)
                         self.labels.append(homolumogap)
 
                     self.labels = np.array(self.labels)
