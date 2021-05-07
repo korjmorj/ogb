@@ -216,7 +216,7 @@ def main():
                 split_idx = self.get_idx_split()
                 part_rows = int(len(split_idx[self.what])*self.part)
                 print(self.what, part_rows)
-                print(split_idx[self.what][i])
+                print(split_idx[self.what][0])
                 print('one smiles', smiles_list[split_idx[self.what][0]])
                 self.graphs = []
                 self.labels = []
