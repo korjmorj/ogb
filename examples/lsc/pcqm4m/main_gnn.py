@@ -146,7 +146,8 @@ def main():
             if self.what=='test':
                 for idx in split_idx[self.what]:
                     graph_obj = smiles2graph(dataset[idx][0])
-                    self.graphs.insert(0,graph_obj)
+                    molecule = Data(x=torch.tensor(graph_obj['node_feat']), edge_index=torch.tensor(graph_obj['edge_index']), edge_attr=torch.tensor(graph_obj['edge_feat']), node_num=torch.tensor(graph_obj['num_nodes']))
+                    self.graphs.insert(0,molecule)
                     gap = dataset[idx][1]
                     self.labels.insert(0,gap)
                 #self.labels = np.array(self.labels)
@@ -154,7 +155,8 @@ def main():
             else:
                 for i in range(part_rows):
                     graph_obj = smiles2graph(dataset[split_idx[self.what][0]][0])
-                    self.graphs.insert(0,graph_obj)
+                    molecule = Data(x=torch.tensor(graph_obj['node_feat']), edge_index=torch.tensor(graph_obj['edge_index']), edge_attr=torch.tensor(graph_obj['edge_feat']), node_num=torch.tensor(graph_obj['num_nodes']))
+                    self.graphs.insert(0,molecule)
                     gap = dataset[split_idx[self.what][0]][1]
                     self.labels.insert(0,gap)
                 #self.labels = np.array(self.labels)
