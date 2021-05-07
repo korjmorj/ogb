@@ -140,7 +140,7 @@ def main():
 
         def data_cutter(self):
             part_rows = int(len(split_idx[self.what])*self.part)
-            part_data=list()
+
             self.graphs = []
             self.labels = []
             if self.what=='test':
