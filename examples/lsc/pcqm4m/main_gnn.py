@@ -230,7 +230,7 @@ def main():
                         assert(len(graph['edge_feat']) == graph['edge_index'].shape[1])
                         assert(len(graph['node_feat']) == graph['num_nodes'])
 
-                        molecule = Data(x=torch.tensor(graph_obj['node_feat']), edge_index=torch.tensor(graph_obj['edge_index']), edge_attr=torch.tensor(graph_obj['edge_feat']), pos=torch.tensor(graph_obj['num_nodes']), y=gap)
+                        molecule = Data(x=torch.tensor(graph['node_feat']), edge_index=torch.tensor(graph['edge_index']), edge_attr=torch.tensor(graph['edge_feat']), pos=torch.tensor(graph['num_nodes']))
                         self.graphs.append(molecule)
                         self.labels.append(homolumogap)
 
@@ -246,7 +246,7 @@ def main():
                         assert(len(graph['edge_feat']) == graph['edge_index'].shape[1])
                         assert(len(graph['node_feat']) == graph['num_nodes'])
 
-                        molecule = Data(x=torch.tensor(graph_obj['node_feat']), edge_index=torch.tensor(graph_obj['edge_index']), edge_attr=torch.tensor(graph_obj['edge_feat']), pos=torch.tensor(graph_obj['num_nodes']), y=gap)
+                        molecule = Data(x=torch.tensor(graph['node_feat']), edge_index=torch.tensor(graph['edge_index']), edge_attr=torch.tensor(graph['edge_feat']), pos=torch.tensor(graph['num_nodes']))
                         self.graphs.append(molecule)
                         self.labels.append(homolumogap)
 
