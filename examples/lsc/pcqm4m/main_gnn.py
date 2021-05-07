@@ -150,9 +150,9 @@ def main():
                     self.graphs.append(molecule)
                     gap = dataset[idx][1]
                     self.labels.append(gap)
-                #self.labels = np.array(self.labels)
+                self.labels = np.array(self.labels)
 
-                part_data=[{'graphs': self.graphs, 'labels': self.labels}]
+                #part_data=[{'graphs': self.graphs, 'labels': self.labels}]
             else:
                 for i in range(part_rows):
                     graph_obj = smiles2graph(dataset[split_idx[self.what][0]][0])
@@ -160,9 +160,9 @@ def main():
                     self.graphs.append(molecule)
                     gap = dataset[split_idx[self.what][0]][1]
                     self.labels.append(gap)
-                #self.labels = np.array(self.labels)
-                part_data=[{'graphs': self.graphs, 'labels': self.labels}]
-            return {'graphs': self.graphs, 'labels': self.labels}
+                self.labels = np.array(self.labels)
+                #part_data=[{'graphs': self.graphs, 'labels': self.labels}]
+            #return {'graphs': self.graphs, 'labels': self.labels}
             
 
 
@@ -183,8 +183,11 @@ def main():
             return '{}({})'.format(self.__class__.__name__, len(self))
         
     train_data = cutted_dataset(dataset, part=args.part, what='train')
+    print('train', len(train_data))
     valid_data = cutted_dataset(dataset, part=args.part, what='valid')
+    print('valid', len(valid_data))
     test_data = cutted_dataset(dataset, part=args.part, what='test')
+    print('test', len(test_data))
     
     train_loader = DataLoader(train_data, batch_size=args.batch_size, shuffle=True, num_workers = args.num_workers)
     valid_loader = DataLoader(train_data, batch_size=args.batch_size, shuffle=True, num_workers = args.num_workers)
