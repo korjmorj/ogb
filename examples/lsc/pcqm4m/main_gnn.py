@@ -254,7 +254,7 @@ def main():
                     print(self.labels)
 
                 print('Saving...')
-                #torch.save({'graphs': self.graphs, 'labels': self.labels}, pre_processed_file_path, pickle_protocol=4)
+                torch.save({'graphs': self.graphs, 'labels': self.labels}, pre_processed_file_path+self.what, pickle_protocol=4)
 
         def get_idx_split(self):
             split_dict = torch.load(osp.join(self.folder, 'split_dict.pt'))
