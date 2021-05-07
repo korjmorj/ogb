@@ -141,23 +141,23 @@ def main():
         def data_cutter(self):
             part_rows = int(len(split_idx[self.what])*self.part)
             part_data=list()
-            self.graphs = []
-            self.labels = []
+            self.graphs = list()
+            self.labels = list()
             if self.what=='test':
                 for idx in split_idx[self.what]:
                     graph_obj = smiles2graph(dataset[idx][0])
-                    self.graphs.append(graph_obj)
+                    self.graphs.insert(0,graph_obj)
                     gap = dataset[idx][1]
-                    self.labels.append(gap)
-                self.labels = np.array(self.labels)
+                    self.labels.insert(0,gap)
+                #self.labels = np.array(self.labels)
                 part_data = {'graphs': self.graphs, 'labels': self.labels}
             else:
                 for i in range(part_rows):
                     graph_obj = smiles2graph(dataset[split_idx[self.what][0]][0])
-                    self.graphs.append(graph_obj)
+                    self.graphs.insert(0,graph_obj)
                     gap = dataset[split_idx[self.what][0]][1]
-                    self.labels.append(gap)
-                self.labels = np.array(self.labels)
+                    self.labels.insert(0,gap)
+                #self.labels = np.array(self.labels)
                 part_data = {'graphs': self.graphs, 'labels': self.labels}
             
             return part_data
