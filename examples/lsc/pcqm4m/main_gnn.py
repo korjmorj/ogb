@@ -152,7 +152,7 @@ def main():
                     self.labels.append(gap)
                 #self.labels = np.array(self.labels)
                 print('Saving...')
-                torch.save({'graphs': self.graphs, 'labels': self.labels}, pre_processed_file_path, pickle_protocol=4)
+                torch.save({'graphs': self.graphs, 'labels': self.labels})
             else:
                 for i in range(part_rows):
                     graph_obj = smiles2graph(dataset[split_idx[self.what][0]][0])
@@ -162,7 +162,7 @@ def main():
                     self.labels.append(gap)
                 #self.labels = np.array(self.labels)
                 print('Saving...')
-                torch.save({'graphs': self.graphs, 'labels': self.labels}, pre_processed_file_path, pickle_protocol=4)
+                torch.save({'graphs': self.graphs, 'labels': self.labels})
             
 
 
