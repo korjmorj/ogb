@@ -142,24 +142,26 @@ def main():
             part_rows = int(len(split_idx[self.what])*self.part)
 
             self.graphs = []
-            self.labels = []
+            #self.labels = []
             if self.what=='test':
                 for idx in split_idx[self.what]:
                     graph_obj = smiles2graph(dataset[idx][0])
-                    molecule = Data(x=torch.tensor(graph_obj['node_feat']), edge_index=torch.tensor(graph_obj['edge_index']), edge_attr=torch.tensor(graph_obj['edge_feat']), node_num=torch.tensor(graph_obj['num_nodes']))
-                    self.graphs.append(molecule)
                     gap = torch.tensor(dataset[idx][1])
-                    self.labels.append(gap)
+                    molecule = Data(x=torch.tensor(graph_obj['node_feat']), edge_index=torch.tensor(graph_obj['edge_index']), edge_attr=torch.tensor(graph_obj['edge_feat']), pos=torch.tensor(graph_obj['num_nodes']), y=gap)
+                    self.graphs.append(molecule)
+                    
+                    #self.labels.append(gap)
                 #self.labels = np.array(self.labels)
 
                 #part_data=[{'graphs': self.graphs, 'labels': self.labels}]
             else:
                 for i in range(part_rows):
-                    graph_obj = smiles2graph(dataset[split_idx[self.what][i]][0])
-                    molecule = Data(x=torch.tensor(graph_obj['node_feat']), edge_index=torch.tensor(graph_obj['edge_index']), edge_attr=torch.tensor(graph_obj['edge_feat']), node_num=torch.tensor(graph_obj['num_nodes']))
+                    graph_obj = smiles2graph(dataset[split_idx[self.what][0]][0])
+                    gap = torch.tensor(dataset[split_idx[self.what][0]][1])
+                    molecule = Data(x=torch.tensor(graph_obj['node_feat']), edge_index=torch.tensor(graph_obj['edge_index']), edge_attr=torch.tensor(graph_obj['edge_feat']), pos=torch.tensor(graph_obj['num_nodes']), y=gap)
                     self.graphs.append(molecule)
-                    gap = torch.tensor(dataset[split_idx[self.what][i]][1])
-                    self.labels.append(gap)
+                    
+                    #self.labels.append(gap)
                 #self.labels = np.array(self.labels)
                 #part_data=[{'graphs': self.graphs, 'labels': self.labels}]
             #return {'graphs': self.graphs, 'labels': self.labels}
@@ -168,7 +170,7 @@ def main():
 
         def __getitem__(self, idx):
 
-            return self.graphs[idx], self.labels[idx]
+            return self.graphs[idx] #, self.labels[idx]
 
         def __len__(self):
 
