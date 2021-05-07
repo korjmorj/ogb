@@ -20,6 +20,7 @@ import random
 from ogb.lsc import PygPCQM4MDataset, PCQM4MEvaluator
 from ogb.lsc import PCQM4MDataset
 from ogb.utils import smiles2graph
+from ogb.utils.url import decide_download, download_url, extract_zip
 
 reg_criterion = torch.nn.L1Loss()
 
