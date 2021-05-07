@@ -146,21 +146,21 @@ def main():
             if self.what=='test':
                 for idx in split_idx[self.what]:
                     graph_obj = smiles2graph(dataset[idx][0])
-                    #molecule = Data(x=torch.tensor(graph_obj['node_feat']), edge_index=torch.tensor(graph_obj['edge_index']), edge_attr=torch.tensor(graph_obj['edge_feat']), node_num=torch.tensor(graph_obj['num_nodes']))
-                    self.graphs.append(graph_obj)
-                    gap = dataset[idx][1]
+                    molecule = Data(x=torch.tensor(graph_obj['node_feat']), edge_index=torch.tensor(graph_obj['edge_index']), edge_attr=torch.tensor(graph_obj['edge_feat']), node_num=torch.tensor(graph_obj['num_nodes']))
+                    self.graphs.append(molecule)
+                    gap = torch.tensor(dataset[idx][1])
                     self.labels.append(gap)
-                self.labels = np.array(self.labels)
+                #self.labels = np.array(self.labels)
 
                 #part_data=[{'graphs': self.graphs, 'labels': self.labels}]
             else:
                 for i in range(part_rows):
-                    graph_obj = smiles2graph(dataset[split_idx[self.what][0]][0])
-                    #molecule = Data(x=torch.tensor(graph_obj['node_feat']), edge_index=torch.tensor(graph_obj['edge_index']), edge_attr=torch.tensor(graph_obj['edge_feat']), node_num=torch.tensor(graph_obj['num_nodes']))
-                    self.graphs.append(graph_obj)
-                    gap = dataset[split_idx[self.what][0]][1]
+                    graph_obj = smiles2graph(dataset[split_idx[self.what][i]][0])
+                    molecule = Data(x=torch.tensor(graph_obj['node_feat']), edge_index=torch.tensor(graph_obj['edge_index']), edge_attr=torch.tensor(graph_obj['edge_feat']), node_num=torch.tensor(graph_obj['num_nodes']))
+                    self.graphs.append(molecule)
+                    gap = torch.tensor(dataset[split_idx[self.what][i]][1])
                     self.labels.append(gap)
-                self.labels = np.array(self.labels)
+                #self.labels = np.array(self.labels)
                 #part_data=[{'graphs': self.graphs, 'labels': self.labels}]
             #return {'graphs': self.graphs, 'labels': self.labels}
             
@@ -168,12 +168,7 @@ def main():
 
         def __getitem__(self, idx):
 
-
-            if isinstance(idx, (int, np.integer)):
-                return self.graphs[idx], self.labels[idx]
-
-            raise IndexError(
-            'Only integer is valid index (got {}).'.format(type(idx).__name__))
+            return self.graphs[idx], self.labels[idx]
 
         def __len__(self):
 
