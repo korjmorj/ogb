@@ -215,13 +215,16 @@ def main():
                 print('Converting SMILES strings into graphs...')
                 split_idx = self.get_idx_split()
                 part_rows = int(len(split_idx[self.what])*self.part)
+                print(self.what, part_rows)
+                print(split_idx[self.what][i])
+                print('one smiles', smiles_list[split_idx[self.what][0]])
                 self.graphs = []
                 self.labels = []
             
                 if self.what=='test':
                     for i in len(split_idx[self.what]):
-                        smiles = smiles_list[[split_idx[self.what][i]]]
-                        homolumogap = homolumogap_list[[split_idx[self.what][i]]]
+                        smiles = smiles_list[split_idx[self.what][i]]
+                        homolumogap = homolumogap_list[split_idx[self.what][i]]
                         graph = self.smiles2graph(smiles)
                 
                         assert(len(graph['edge_feat']) == graph['edge_index'].shape[1])
@@ -235,8 +238,8 @@ def main():
                 else:
                     for i in tqdm(range(part_rows)):
 
-                        smiles = smiles_list[[split_idx[self.what][i]]]
-                        homolumogap = homolumogap_list[[split_idx[self.what][i]]]
+                        smiles = smiles_list[split_idx[self.what][i]]
+                        homolumogap = homolumogap_list[split_idx[self.what][i]]
                         graph = self.smiles2graph(smiles)
                 
                         assert(len(graph['edge_feat']) == graph['edge_index'].shape[1])
