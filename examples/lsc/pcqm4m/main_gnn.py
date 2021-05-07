@@ -57,6 +57,8 @@ def eval(model, device, loader, evaluator):
     y_pred = torch.cat(y_pred, dim = 0)
 
     input_dict = {"y_true": y_true, "y_pred": y_pred}
+    print("y_true", y_true.shape)
+    print("y_pred", y_pred)
 
     return evaluator.eval(input_dict)["mae"]
 
