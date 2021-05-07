@@ -123,71 +123,20 @@ def main():
     evaluator = PCQM4MEvaluator()
     
     ##ОГРОМНЫЙ КОСТЫЛЬ 
-    class cutted_dataset(object):
-        def __init__(self, root = 'dataset', smiles2graph = smiles2graph, only_smiles=False, part=None, what=None):
- 
-
-            self.original_root = root
-            self.smiles2graph = smiles2graph
-            self.only_smiles = only_smiles
-
-            self.version = 1
-            self.part = part
-            self.what = what
-
-        #self.prepare_smiles()
-            self.data_cutter()
-
-        def data_cutter(self):
-            part_rows = int(len(split_idx[self.what])*self.part)
-
-            self.graphs = []
-            self.labels = []
-            if self.what=='test':
-                for idx in split_idx[self.what]:
-                    graph_obj = smiles2graph(dataset[idx][0])
-                    molecule = Data(x=torch.tensor(graph_obj['node_feat']), edge_index=torch.tensor(graph_obj['edge_index']), edge_attr=torch.tensor(graph_obj['edge_feat']), node_num=torch.tensor(graph_obj['num_nodes']))
-                    self.graphs.append(molecule)
-                    gap = dataset[idx][1]
-                    self.labels.append(gap)
-                #self.labels = np.array(self.labels)
-
-                part_data={'graphs': self.graphs, 'labels': self.labels}
-            else:
-                for i in range(part_rows):
-                    graph_obj = smiles2graph(dataset[split_idx[self.what][0]][0])
-                    molecule = Data(x=torch.tensor(graph_obj['node_feat']), edge_index=torch.tensor(graph_obj['edge_index']), edge_attr=torch.tensor(graph_obj['edge_feat']), node_num=torch.tensor(graph_obj['num_nodes']))
-                    self.graphs.append(molecule)
-                    gap = dataset[split_idx[self.what][0]][1]
-                    self.labels.append(gap)
-                #self.labels = np.array(self.labels)
-                part_data={'graphs': self.graphs, 'labels': self.labels}
-            return part_data
+    def data_cutter(part, what):
+        part_rows = int(len(split_idx[what])*part)
+        part_data=[]
+        for i in range(part_rows):
+            graph_obj = smiles2graph(dataset[i][0])
+            gap = dataset[i][1]
+            molecule = Data(x=torch.tensor(graph_obj['node_feat']), edge_index=torch.tensor(graph_obj['edge_index']), edge_attr=torch.tensor(graph_obj['edge_feat']), node_num=torch.tensor(graph_obj['num_nodes']), y=torch.tensor(gap))
             
-
-
-        def __getitem__(self, idx):
-
-
-            if isinstance(idx, (int, np.integer)):
-                return self.graphs[idx], self.labels[idx]
-
-            raise IndexError(
-            'Only integer is valid index (got {}).'.format(type(idx).__name__))
-
-        def __len__(self):
-
-            return len(self.graphs)
-
-        def __repr__(self):  # pragma: no cover
-            return '{}({})'.format(self.__class__.__name__, len(self))
-
-    train_data = cutted_dataset(dataset, part=args.part, what='train')
-    print('train', len(train_data))
-    valid_data = cutted_dataset(dataset, part=args.part, what='train')
-    print('valid', len(valid_data))
-    test_data = cutted_dataset(dataset, part=args.part, what='train')
-    print('test', len(test_data))
+            part_data.append(molecule)
+            
+        return part_data
+    train_data = data_cutter(args.part, 'train')
+    valid_data = data_cutter(args.part, 'valid')
+    test_data = data_cutter(args.part, 'test')
     
     train_loader = DataLoader(train_data, batch_size=args.batch_size, shuffle=True, num_workers = args.num_workers)
     valid_loader = DataLoader(train_data, batch_size=args.batch_size, shuffle=True, num_workers = args.num_workers)
