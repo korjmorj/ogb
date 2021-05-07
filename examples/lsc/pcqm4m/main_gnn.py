@@ -149,7 +149,7 @@ def main():
                 if input('Will you update the dataset now? (y/N)\n').lower() == 'y':
                     shutil.rmtree(self.folder)
 
-            super(PCQM4MDataset, self).__init__()
+            #super(PCQM4MDataset, self).__init__()
 
         # Prepare everything.
         # download if there is no raw file
