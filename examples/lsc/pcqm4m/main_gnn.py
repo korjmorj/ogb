@@ -151,8 +151,8 @@ def main():
                     gap = dataset[idx][1]
                     self.labels.append(gap)
                 #self.labels = np.array(self.labels)
-                print('Saving...')
-                torch.save({'graphs': self.graphs, 'labels': self.labels})
+
+                part_data={'graphs': self.graphs, 'labels': self.labels}
             else:
                 for i in range(part_rows):
                     graph_obj = smiles2graph(dataset[split_idx[self.what][0]][0])
@@ -161,8 +161,8 @@ def main():
                     gap = dataset[split_idx[self.what][0]][1]
                     self.labels.append(gap)
                 #self.labels = np.array(self.labels)
-                print('Saving...')
-                torch.save({'graphs': self.graphs, 'labels': self.labels})
+                part_data={'graphs': self.graphs, 'labels': self.labels}
+            return part_data
             
 
 
