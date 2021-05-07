@@ -197,15 +197,62 @@ def main():
             graphs.append(molecule)
             
         return graphs
+    class cutted_dataset(object):
+        def __init__(self, dataset=None, part=None, what=None):
+ 
+            self.dataset = dataset
+            self.part = part
+            self.what = what
 
+ 
+            self.data_cutter()
+
+        def data_cutter(self):
+            part_rows = int(len(split_idx[self.what])*self.part)
+
+            self.graphs = []
+            #self.labels = []
+            if self.what=='test':
+                for idx in split_idx[self.what]:
+                    graph_obj = smiles2graph(self.dataset[idx][0])
+                    gap = torch.tensor(self.dataset[idx][1])
+                    molecule = Data(x=torch.tensor(graph_obj['node_feat']), edge_index=torch.tensor(graph_obj['edge_index']), edge_attr=torch.tensor(graph_obj['edge_feat']), pos=torch.tensor(graph_obj['num_nodes']), y=gap)
+                    #self.graphs.append(graph_obj)
+                    
+                    #self.labels.append(gap)
+                #self.labels = np.array(self.labels)
+
+                #part_data=[{'graphs': self.graphs, 'labels': self.labels}]
+            else:
+                for i in range(part_rows):
+                    graph_obj = smiles2graph(self.dataset[split_idx[self.what][i]][0])
+                    gap = torch.tensor(self.dataset[split_idx[self.what][i]][1])
+                    molecule = Data(x=torch.tensor(graph_obj['node_feat']), edge_index=torch.tensor(graph_obj['edge_index']), edge_attr=torch.tensor(graph_obj['edge_feat']), pos=torch.tensor(graph_obj['num_nodes']), y=gap)
+                    self.graphs.append(molecule)
+                    
+                    #self.labels.append(gap)
+                #self.labels = np.array(self.labels)
+                #part_data=[{'graphs': self.graphs, 'labels': self.labels}]
+            #return {'graphs': self.graphs, 'labels': self.labels}
             
-            
-        return graphs
-    train_data = data_cutter(args.part, 'train')
+
+
+        def __getitem__(self, idx):
+
+            return self.graphs[idx] #, self.labels[idx]
+
+        def __len__(self):
+
+            return len(self.graphs)
+
+        def __repr__(self):  # pragma: no cover
+            return '{}({})'.format(self.__class__.__name__, len(self))
+
+    train_data = cutted_dataset(dataset, args.part, 'train')
     print('train', len(train_data))
-    valid_data = data_cutter(args.part, 'valid')
+    valid_data = cutted_dataset(dataset, args.part, 'valid')
     print('valid', len(valid_data))
-    test_data = data_cutter(args.part, 'test')
+    test_data = cutted_dataset(dataset, args.part, 'test')
     print('test', len(test_data))
     
     train_loader = DataLoader(train_data, batch_size=args.batch_size, shuffle=True, num_workers = args.num_workers)
