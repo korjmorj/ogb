@@ -265,6 +265,7 @@ def main():
             if args.save_test_dir is not '':
                 print('Predicting on test data...')
                 y_pred = test(model, device, test_loader)
+                print('y_pred shape', y_pred.shape)
                 print('Saving test submission file...')
                 evaluator.save_test_submission({'y_pred': y_pred}, args.save_test_dir)
 
