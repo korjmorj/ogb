@@ -211,29 +211,23 @@ def main():
             part_rows = int(len(split_idx[self.what])*self.part)
 
             self.graphs = []
-            #self.labels = []
+            
             if self.what=='test':
                 for idx in split_idx[self.what]:
                     graph_obj = smiles2graph(self.dataset[idx][0])
                     gap = torch.tensor(self.dataset[idx][1])
                     molecule = Data(x=torch.tensor(graph_obj['node_feat']), edge_index=torch.tensor(graph_obj['edge_index']), edge_attr=torch.tensor(graph_obj['edge_feat']), pos=torch.tensor(graph_obj['num_nodes']), y=gap)
-                    #self.graphs.append(graph_obj)
+                    self.graphs.append(graph_obj)
                     
-                    #self.labels.append(gap)
-                #self.labels = np.array(self.labels)
-
-                #part_data=[{'graphs': self.graphs, 'labels': self.labels}]
             else:
                 for i in range(part_rows):
-                    graph_obj = smiles2graph(self.dataset[split_idx[self.what][i]][0])
-                    gap = torch.tensor(self.dataset[split_idx[self.what][i]][1])
+                    idx = random.randint(0, len(split_idx[self.what]))
+                    graph_obj = smiles2graph(self.dataset[split_idx[self.what][idx]][0])
+                    gap = torch.tensor(self.dataset[split_idx[self.what][idx]][1])
                     molecule = Data(x=torch.tensor(graph_obj['node_feat']), edge_index=torch.tensor(graph_obj['edge_index']), edge_attr=torch.tensor(graph_obj['edge_feat']), pos=torch.tensor(graph_obj['num_nodes']), y=gap)
                     self.graphs.append(molecule)
                     
-                    #self.labels.append(gap)
-                #self.labels = np.array(self.labels)
-                #part_data=[{'graphs': self.graphs, 'labels': self.labels}]
-            #return {'graphs': self.graphs, 'labels': self.labels}
+                    
             
 
 
