@@ -110,7 +110,7 @@ def eval(model, device, loader, evaluator):
 
     input_dict = {"y_true": y_true, "y_pred": y_pred}
     print("y_true", y_true.shape)
-    print("y_pred", y_pred)
+    print("y_pred", y_pred.shape)
 
     return evaluator.eval(input_dict)["mae"]
 
