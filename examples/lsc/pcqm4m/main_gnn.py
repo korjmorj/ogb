@@ -148,6 +148,7 @@ def main():
                         help='dimensionality of hidden units in GNNs (default: 600)')
     parser.add_argument('--train_subset', action='store_true')
     parser.add_argument('--part', type=float, default=0.1)
+    parser.add_argument('--create_test', type=bool, default=False) #переменная для создания полного тестового датасета
     parser.add_argument('--batch_size', type=int, default=256,
                         help='input batch size for training (default: 256)')
     parser.add_argument('--epochs', type=int, default=100,
@@ -246,8 +247,11 @@ def main():
     print('train', len(train_data))
     valid_data = cutted_dataset(dataset, args.part, 'valid')
     print('valid', len(valid_data))
-    test_data = cutted_dataset(dataset, args.part, 'test')
-    print('test', len(test_data))
+    if args.create_test:
+        test_data = cutted_dataset(dataset, args.part, 'test')
+        print('test', len(test_data))
+    else:
+        print('сегодня без теста')
     
     train_loader = DataLoader(train_data, batch_size=args.batch_size, shuffle=True, num_workers = args.num_workers)
     valid_loader = DataLoader(train_data, batch_size=args.batch_size, shuffle=True, num_workers = args.num_workers)
@@ -325,12 +329,13 @@ def main():
                 checkpoint = {'epoch': epoch, 'model_state_dict': model.state_dict(), 'optimizer_state_dict': optimizer.state_dict(), 'scheduler_state_dict': scheduler.state_dict(), 'best_val_mae': best_valid_mae, 'num_params': num_params}
                 torch.save(checkpoint, os.path.join(args.checkpoint_dir, 'checkpoint.pt'))
 
-            if args.save_test_dir is not '':
-                print('Predicting on test data...')
-                y_pred = test(model, device, test_loader)
-                print('y_pred shape', y_pred.shape)
-                print('Saving test submission file...')
-                evaluator.save_test_submission({'y_pred': y_pred}, args.save_test_dir)
+            if args.create_test:
+                if args.save_test_dir is not '':
+                    print('Predicting on test data...')
+                    y_pred = test(model, device, test_loader)
+                    print('y_pred shape', y_pred.shape)
+                    print('Saving test submission file...')
+                    evaluator.save_test_submission({'y_pred': y_pred}, args.save_test_dir)
 
         scheduler.step()
             
